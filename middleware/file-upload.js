@@ -1,0 +1,22 @@
+// backend/middleware/file-upload.js
+const multer = require("multer");
+
+const MIME_TYPE_MAP = {
+  "image/png": "png",
+  "image/jpeg": "jpeg",
+  "image/jpg": "jpg",
+};
+
+const fileUpload = multer({
+  limits: { fileSize: 500000 }, // Batas 500KB
+  // GUNAKAN memoryStorage: File disimpan sementara di RAM (Buffer)
+  // Cocok untuk Vercel agar bisa langsung di-upload ke Supabase Storage
+  storage: multer.memoryStorage(),
+  fileFilter: (req, file, cb) => {
+    const isValid = !!MIME_TYPE_MAP[file.mimetype];
+    let error = isValid ? null : new Error("Invalid mime type!");
+    cb(error, isValid);
+  },
+});
+
+module.exports = fileUpload;
